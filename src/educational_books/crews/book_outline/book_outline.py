@@ -1,62 +1,66 @@
-from crewai import Agent, Crew, Process, Task
+from crewai import Agent, Crew, Process, Task, LLM
 from crewai.project import CrewBase, agent, crew, task
+from crewai_tools import SerperDevTool, WebsiteSearchTool
+from dotenv import load_dotenv
+import os
 
-# If you want to run a snippet of code before or after the crew starts, 
-# you can use the @before_kickoff and @after_kickoff decorators
-# https://docs.crewai.com/concepts/crews#example-crew-class-with-decorators
+from educational_books.types import BookOutline
+
+load_dotenv()
 
 @CrewBase
-class BookOutline():
-	"""BookOutline crew"""
+class BookOutlineCrew():
+  """Bookoutline crew"""
+  agents_config = 'config/agents.yaml'
+  tasks_config = 'config/tasks.yaml'
+  llm = LLM(api_key=os.getenv("GROQ_API_KEY"), model="groq/llama-3.3-70b-versatile")
 
-	# Learn more about YAML configuration files here:
-	# Agents: https://docs.crewai.com/concepts/agents#yaml-configuration-recommended
-	# Tasks: https://docs.crewai.com/concepts/tasks#yaml-configuration-recommended
-	agents_config = 'config/agents.yaml'
-	tasks_config = 'config/tasks.yaml'
+  @agent
+  def researcher(self) -> Agent:
+    return Agent(config=self.agents_config['researcher'], llm=self.llm, tools=[
+    SerperDevTool(), 
+    # WebsiteSearchTool(
+    #   config=dict(
+    #     llm=dict(
+    #       provider="groq",
+    #       config=dict(
+    #         model="llama3-8b-8192",
+    #         temperature=0.3,
+    #         top_p=2,
+    #         # stream=true,
+    #       ),
+    #     ),
+    #     embedder=dict(
+    #       provider="google", # or openai, ollama, ...
+    #       config=dict(
+    #           model="models/embedding-001",
+    #           task_type="retrieval_document",
+    #           # title="Embeddings",
+    #       ),
+    #     ),
+    #   )
+    # )
+    ], verbose=True)
 
-	# If you would like to add tools to your agents, you can learn more about it here:
-	# https://docs.crewai.com/concepts/agents#agent-tools
-	@agent
-	def researcher(self) -> Agent:
-		return Agent(
-			config=self.agents_config['researcher'],
-			verbose=True
-		)
+  @agent
+  def planner(self) -> Agent:
+    return Agent(config=self.agents_config['planner'], llm=self.llm, verbose=True)
 
-	@agent
-	def reporting_analyst(self) -> Agent:
-		return Agent(
-			config=self.agents_config['reporting_analyst'],
-			verbose=True
-		)
+  @task
+  def research_topic(self) -> Task:
+    return Task(config=self.tasks_config['research_topic'], agent=self.researcher())
 
-	# To learn more about structured task outputs, 
-	# task dependencies, and task callbacks, check out the documentation:
-	# https://docs.crewai.com/concepts/tasks#overview-of-a-task
-	@task
-	def research_task(self) -> Task:
-		return Task(
-			config=self.tasks_config['research_task'],
-		)
+  @task
+  def generate_outline(self) -> Task:
+    return Task(config=self.tasks_config['generate_outline'], agent=self.planner(), output_pydantic=BookOutline)
 
-	@task
-	def reporting_task(self) -> Task:
-		return Task(
-			config=self.tasks_config['reporting_task'],
-			output_file='report.md'
-		)
-
-	@crew
-	def crew(self) -> Crew:
-		"""Creates the BookOutline crew"""
-		# To learn how to add knowledge sources to your crew, check out the documentation:
-		# https://docs.crewai.com/concepts/knowledge#what-is-knowledge
-
-		return Crew(
-			agents=self.agents, # Automatically created by the @agent decorator
-			tasks=self.tasks, # Automatically created by the @task decorator
-			process=Process.sequential,
-			verbose=True,
-			# process=Process.hierarchical, # In case you wanna use that instead https://docs.crewai.com/how-to/Hierarchical/
-		)
+  @crew
+  def crew(self) -> Crew:
+    """Creates the Bookoutline crew"""
+    return Crew(
+      agents=self.agents,
+      tasks=self.tasks,
+      process=Process.sequential,
+      verbose=True,
+      max_rpm=1,
+    )

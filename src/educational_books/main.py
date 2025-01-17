@@ -1,51 +1,48 @@
 #!/usr/bin/env python
-from random import randint
-
 from pydantic import BaseModel
-
+from typing import List
 from crewai.flow.flow import Flow, listen, start
+from educational_books.crews.book_outline.book_outline import BookOutlineCrew
+from educational_books.types import Section, SectionOutline
 
-from educational_books.crews.poem_crew.poem_crew import PoemCrew
+class BookState(BaseModel):
+  title: str = "Algorithm and Data Structures"
+  book: List[Section] = []
+  book_outline: List[SectionOutline] = []
+  topic: str = "Algorithm and Data Structures"
 
+class BookFlow(Flow[BookState]):
+  initial_state = BookState
 
-class PoemState(BaseModel):
-    sentence_count: int = 1
-    poem: str = ""
-
-
-class PoemFlow(Flow[PoemState]):
-
-    @start()
-    def generate_sentence_count(self):
-        print("Generating sentence count")
-        self.state.sentence_count = randint(1, 5)
-
-    @listen(generate_sentence_count)
-    def generate_poem(self):
-        print("Generating poem")
-        result = (
-            PoemCrew()
-            .crew()
-            .kickoff(inputs={"sentence_count": self.state.sentence_count})
-        )
-
-        print("Poem generated", result.raw)
-        self.state.poem = result.raw
-
-    @listen(generate_poem)
-    def save_poem(self):
-        print("Saving poem")
-        with open("poem.txt", "w") as f:
-            f.write(self.state.poem)
-
+  @start()
+  def generate_book_outline(self):
+    print("Generating book outline")
+    crew = BookOutlineCrew()
+    outline = crew.crew().kickoff(inputs={"topic": self.state.topic})
+    self.state.book_outline = outline["sections"]
+  
+  @listen(generate_book_outline)
+  def save_book_outline(self):
+    print("Saving book outline")
+    with open("book_outline.md", "w") as f:
+      for section in self.state.book_outline:
+        f.write(f"# {section.title}\n")
+        f.write(f"{section.description}\n\n")
+        f.write(f"## Covered Skills\n")
+        for skill in section.covered_skills:
+          f.write(f"- {skill}\n")
+        f.write("\n")
+        f.write(f"## Learning Objectives\n")
+        for objective in section.objectives:
+          f.write(f"- {objective}\n")
 
 def kickoff():
-    poem_flow = PoemFlow()
+    poem_flow = BookFlow()
     poem_flow.kickoff()
 
 
 def plot():
-    poem_flow = PoemFlow()
+    poem_flow = BookFlow()
     poem_flow.plot()
 
 
