@@ -1,6 +1,5 @@
 from typing import List
 from pydantic import BaseModel
-
 class SectionOutline(BaseModel):
   title: str
   description: str
@@ -14,4 +13,3 @@ class Section(BaseModel):
   title: str
   resources: List[str]
   content: str
-  assignments: List[str]

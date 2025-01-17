@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from typing import List
 from crewai.flow.flow import Flow, listen, start
 from educational_books.crews.book_outline.book_outline import BookOutlineCrew
+from educational_books.crews.book_content.book_content import BookContentCrew
 from educational_books.types import Section, SectionOutline
 
 class BookState(BaseModel):
@@ -36,15 +37,49 @@ class BookFlow(Flow[BookState]):
         for objective in section.objectives:
           f.write(f"- {objective}\n")
 
-def kickoff():
-    poem_flow = BookFlow()
-    poem_flow.kickoff()
+  @listen(generate_book_outline)
+  def generate_book(self):
+    print("Generating book")
+    crew = BookContentCrew()
+    book_outline = [section.model_dump_json() for section in self.state.book_outline]
+    for section in self.state.book_outline:
+      print(f"Generating content for {section.title}")
+      content = crew.crew().kickoff(inputs={
+        "topic": self.state.topic,
+        "section_title": section.title,
+        "section_description": section.description,
+        "covered_skills": section.covered_skills,
+        "objectives": section.objectives,
+        "book_outline": book_outline
+      })
+      print(f"Content generated for {section.title} with {len(content['content'])} characters")
+      title = content["title"]
+      resources = content["resources"]
+      content = content["content"]
+      section = Section(title=title, resources=resources, content=content)
+      self.state.book.append(section)
+    print(f"Book generated with {len(self.state.book)} sections")
 
+  @listen(generate_book)
+  def save_book(self):
+    print("Saving book")
+    with open(f"{self.state.title.replace(' ', '_')}.md", "w") as f:
+      for section in self.state.book:
+        f.write(f"# {section.title}\n")
+        f.write(f"{section.content}\n\n")
+        f.write(f"## Resources\n")
+        for resource in section.resources:
+          f.write(f"- {resource}\n")
+        f.write("\n")
+
+def kickoff():
+  poem_flow = BookFlow()
+  poem_flow.kickoff()
 
 def plot():
-    poem_flow = BookFlow()
-    poem_flow.plot()
+  poem_flow = BookFlow()
+  poem_flow.plot()
 
 
 if __name__ == "__main__":
-    kickoff()
+  kickoff()
