@@ -5,15 +5,21 @@ from crewai.flow.flow import Flow, listen, start
 from educational_books.crews.book_outline.book_outline import BookOutlineCrew
 from educational_books.crews.book_content.book_content import BookContentCrew
 from educational_books.types import Section, SectionOutline
+import asyncio
 
 class BookState(BaseModel):
-  title: str = "Algorithm and Data Structures"
+  title: str = "Mastering Competitive Programming"
   book: List[Section] = []
   book_outline: List[SectionOutline] = []
-  topic: str = "Algorithm and Data Structures"
+  topic: str = "Data Structures and Algorithms in Competitive Programming"
 
 class BookFlow(Flow[BookState]):
   initial_state = BookState
+
+  def write_to_file(self, filename: str, content: str, mode: str = "a"):
+    """Helper method to write content to the file"""
+    with open(filename, mode) as f:
+      f.write(content)
 
   @start()
   def generate_book_outline(self):
@@ -25,52 +31,50 @@ class BookFlow(Flow[BookState]):
   @listen(generate_book_outline)
   def save_book_outline(self):
     print("Saving book outline")
-    with open("book_outline.md", "w") as f:
-      for section in self.state.book_outline:
-        f.write(f"# {section.title}\n")
-        f.write(f"{section.description}\n\n")
-        f.write(f"## Covered Skills\n")
-        for skill in section.covered_skills:
-          f.write(f"- {skill}\n")
-        f.write("\n")
-        f.write(f"## Learning Objectives\n")
-        for objective in section.objectives:
-          f.write(f"- {objective}\n")
+    content = ""
+    for section in self.state.book_outline:
+      content += f"# {section.title}\n"
+      content += f"{section.description}\n\n"
+      content += f"## Covered Skills\n"
+      for skill in section.covered_skills:
+        content += f"- {skill}\n"
+      content += "\n"
+      content += f"## Learning Objectives\n"
+      for objective in section.objectives:
+        content += f"- {objective}\n"
+      content += "\n"
+    self.write_to_file(f"{self.state.title.replace(' ', '_')}_outline.md", content, "w")
 
   @listen(generate_book_outline)
-  def generate_book(self):
+  async def generate_book(self):
     print("Generating book")
     crew = BookContentCrew()
-    book_outline = [section.model_dump_json() for section in self.state.book_outline]
-    for section in self.state.book_outline:
-      print(f"Generating content for {section.title}")
+    tasks = []
+    book_outline = [(i, section.title, section.description, section.covered_skills) for i, section in enumerate(self.state.book_outline)]
+
+    async def generate_section(section):
       content = crew.crew().kickoff(inputs={
         "topic": self.state.topic,
         "section_title": section.title,
         "section_description": section.description,
         "covered_skills": section.covered_skills,
-        "objectives": section.objectives,
         "book_outline": book_outline
       })
-      print(f"Content generated for {section.title} with {len(content['content'])} characters")
       title = content["title"]
-      resources = content["resources"]
       content = content["content"]
-      section = Section(title=title, resources=resources, content=content)
-      self.state.book.append(section)
-    print(f"Book generated with {len(self.state.book)} sections")
+      section_content = f"# {title}\n{content}\n\n"
+      self.write_to_file(f"{self.state.title.replace(' ', '_')}.md", section_content)
+      
+      section = Section(title=title, content=content)
+      return section
+    for section in self.state.book_outline:
+      print(f"Generating content for {section.title}")
+      task = asyncio.create_task(generate_section(section))
+      tasks.append(task)
 
-  @listen(generate_book)
-  def save_book(self):
-    print("Saving book")
-    with open(f"{self.state.title.replace(' ', '_')}.md", "w") as f:
-      for section in self.state.book:
-        f.write(f"# {section.title}\n")
-        f.write(f"{section.content}\n\n")
-        f.write(f"## Resources\n")
-        for resource in section.resources:
-          f.write(f"- {resource}\n")
-        f.write("\n")
+    sections = await asyncio.gather(*tasks)
+    self.state.book = sections
+    print(f"Book generated with {len(self.state.book)} sections")
 
 def kickoff():
   poem_flow = BookFlow()
