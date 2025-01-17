@@ -11,5 +11,4 @@ class BookOutline(BaseModel):
 
 class Section(BaseModel):
   title: str
-  resources: List[str]
   content: str

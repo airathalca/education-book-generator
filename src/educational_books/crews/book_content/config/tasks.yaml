@@ -1,17 +1,36 @@
-research_task:
+research_section:
   description: >
-    Conduct a thorough research about {topic}
-    Make sure you find any interesting and relevant information given
-    the current year is 2024.
-  expected_output: >
-    A list with 10 bullet points of the most relevant information about {topic}
-  agent: researcher
+    Research the provided section topic, title, and outline to gather additional content that will be helpful in writing the section.
+    Ensure you focus on reliable, high-quality sources of information.
 
-reporting_task:
-  description: >
-    Review the context you got and expand each topic into a full section for a report.
-    Make sure the report is detailed and contains any and all relevant information.
+    Here is the outline description for the section:\n\n {section_description}
+    Here is the skill or key points that will be covered in this section:\n\n {covered_skills}
+    Here is the objective that students should achieve after reading this section:\n\n {objectives}
+
+    When researching, consider the following key points:
+    - you need to gather enough information to write a 2,000-word section
+    - The section you are researching needs to fit in well with the rest of the sections in the book.
+
+    Here is the outline of the entire book:\n\n
+    {book_outline}
   expected_output: >
-    A fully fledged report with the main topics, each with a full section of information.
-    Formatted as markdown without '```'
-  agent: reporting_analyst
+    A set of reliable and high-quality content that will be used to write the section. This content should be well-organized and relevant to the section topic.
+
+write_section:
+  description: >
+    Write a well-structured section based on the section title, goal, and outline description. 
+    Each section should be written in markdown and should contain around 2,000 words.
+
+    Here is the topic for the book: {topic}
+    Here is the title of the section: {section_title}
+    Here is the outline description for the section:\n\n {section_description}
+    Here is the skill or key points that will be covered in this section:\n\n {covered_skills}
+    Here is the objective that students should achieve after reading this section:\n\n {objectives}
+
+    Important notes:
+    - The section you are writing needs to fit in well with the rest of the sections in the book.
+
+    Here is the outline of the entire book:\n\n
+    {book_outline}
+  expected_output: >
+    A markdown-formatted section of around 2,000 words that covers the provided section title and outline description.

@@ -13,33 +13,12 @@ class BookOutlineCrew():
   """Bookoutline crew"""
   agents_config = 'config/agents.yaml'
   tasks_config = 'config/tasks.yaml'
-  llm = LLM(api_key=os.getenv("GROQ_API_KEY"), model="groq/llama-3.3-70b-versatile")
+  llm = LLM(model="gemini/gemini-2.0-flash-exp")
 
   @agent
   def researcher(self) -> Agent:
     return Agent(config=self.agents_config['researcher'], llm=self.llm, tools=[
     SerperDevTool(), 
-    # WebsiteSearchTool(
-    #   config=dict(
-    #     llm=dict(
-    #       provider="groq",
-    #       config=dict(
-    #         model="llama3-8b-8192",
-    #         temperature=0.3,
-    #         top_p=2,
-    #         # stream=true,
-    #       ),
-    #     ),
-    #     embedder=dict(
-    #       provider="google", # or openai, ollama, ...
-    #       config=dict(
-    #           model="models/embedding-001",
-    #           task_type="retrieval_document",
-    #           # title="Embeddings",
-    #       ),
-    #     ),
-    #   )
-    # )
     ], verbose=True)
 
   @agent
@@ -62,5 +41,5 @@ class BookOutlineCrew():
       tasks=self.tasks,
       process=Process.sequential,
       verbose=True,
-      max_rpm=1,
+      max_rpm=10,
     )
