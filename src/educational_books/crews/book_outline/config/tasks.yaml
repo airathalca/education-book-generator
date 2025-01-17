@@ -1,17 +1,17 @@
-research_task:
+research_topic:
   description: >
-    Conduct a thorough research about {topic}
-    Make sure you find any interesting and relevant information given
-    the current year is 2024.
+    Research the provided topic of {topic} to gather the most important information that will 
+    be useful in creating a educational book outline. Ensure you focus on high-quality, reliable sources.
+    The information should focus on educational content that is relevant.
   expected_output: >
-    A list with 10 bullet points of the most relevant information about {topic}
-  agent: researcher
+    A set of key points and important information about {topic} that will be used to create the outline.
 
-reporting_task:
+generate_outline:
   description: >
-    Review the context you got and expand each topic into a full section for a report.
-    Make sure the report is detailed and contains any and all relevant information.
+    Create an educational book outline with sections in sequential order so that students can easily follow and understand the content in order.
+    Ensure that each sections has a title and a brief description that highlights what will be covered in that section.
+    Each sections also contain a list of skills or key concepts that will be covered and a list of learning objectives.
+    It's important to note that each sections is only going to be 2,000 words or less.
+    Also, make sure that you do not duplicate any sections or topics in the outline.
   expected_output: >
-    A fully fledged report with the main topics, each with a full section of information.
-    Formatted as markdown without '```'
-  agent: reporting_analyst
+    An outline of sections, with titles, brief descriptions, list of skills or key concepts, and learning objectives for each section that will be covered in that section.
