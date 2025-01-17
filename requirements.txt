@@ -1,0 +1,5 @@
+crewai
+crewai-tools
+pydantic
+langchain-groq
+langchain-community
