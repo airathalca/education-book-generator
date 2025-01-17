@@ -14,5 +14,16 @@ generate_outline:
     It's important to note that the order of the sections should make sense and flow logically for students to learn effectively.
     Also, make sure that you do not duplicate any sections or topics in the outline.
   expected_output: >
-    An outline of sections, with titles, brief descriptions and list of skills or key concepts that will be covered in that section.
+    A book title, list of outline sections with a title, brief description,  list of skills or key concepts, and list of objectives that will be covered in that section.
+    Example:
+    Book Title: ...
+    Sections: [
+      {
+        title: ...,
+        description: ...,
+        covered_skills: [...],
+        objectives: [...]
+      },
+      ...
+    ]
     Minimum of sections should be 3 and maximum should be 15.

@@ -8,10 +8,10 @@ from educational_books.types import Section, SectionOutline
 import asyncio
 
 class BookState(BaseModel):
-  title: str = "Mastering Competitive Programming"
+  title: str = "Mastering Data Structures and Algorithms"
   book: List[Section] = []
   book_outline: List[SectionOutline] = []
-  topic: str = "Data Structures and Algorithms in Competitive Programming"
+  topic: str = "Sorting Algorithms"
 
 class BookFlow(Flow[BookState]):
   initial_state = BookState
@@ -22,10 +22,17 @@ class BookFlow(Flow[BookState]):
       f.write(content)
 
   @start()
+  def initialize(self, topic: str = None):
+    print("Initializing book flow")
+    if topic:
+      self.state.topic = topic
+
+  @listen(initialize)
   def generate_book_outline(self):
     print("Generating book outline")
     crew = BookOutlineCrew()
     outline = crew.crew().kickoff(inputs={"topic": self.state.topic})
+    self.state.title = outline["title"]
     self.state.book_outline = outline["sections"]
   
   @listen(generate_book_outline)
@@ -77,12 +84,12 @@ class BookFlow(Flow[BookState]):
     print(f"Book generated with {len(self.state.book)} sections")
 
 def kickoff():
-  poem_flow = BookFlow()
-  poem_flow.kickoff()
+  book_name = BookFlow(title="Mastering Search Algorithms", topic="Search Algorithms")
+  book_name.kickoff()
 
 def plot():
-  poem_flow = BookFlow()
-  poem_flow.plot()
+  book_name = BookFlow()
+  book_name.plot()
 
 
 if __name__ == "__main__":

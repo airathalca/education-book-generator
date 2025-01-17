@@ -7,6 +7,7 @@ class SectionOutline(BaseModel):
   objectives: List[str]
 
 class BookOutline(BaseModel):
+  title: str
   sections: List[SectionOutline]
 
 class Section(BaseModel):
