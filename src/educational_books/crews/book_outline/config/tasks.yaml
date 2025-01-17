@@ -10,8 +10,9 @@ generate_outline:
   description: >
     Create an educational book outline with sections in sequential order so that students can easily follow and understand the content in order.
     Ensure that each sections has a title and a brief description that highlights what will be covered in that section.
-    Each sections also contain a list of skills or key concepts that will be covered and a list of learning objectives.
-    It's important to note that each sections is only going to be 2,000 words or less.
+    Each sections also contain a list of skills or key concepts that will be covered.
+    It's important to note that the order of the sections should make sense and flow logically for students to learn effectively.
     Also, make sure that you do not duplicate any sections or topics in the outline.
   expected_output: >
-    An outline of sections, with titles, brief descriptions, list of skills or key concepts, and learning objectives for each section that will be covered in that section.
+    An outline of sections, with titles, brief descriptions and list of skills or key concepts that will be covered in that section.
+    Minimum of sections should be 3 and maximum should be 15.

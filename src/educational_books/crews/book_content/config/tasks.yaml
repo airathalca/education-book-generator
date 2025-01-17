@@ -5,7 +5,6 @@ research_section:
 
     Here is the outline description for the section:\n\n {section_description}
     Here is the skill or key points that will be covered in this section:\n\n {covered_skills}
-    Here is the objective that students should achieve after reading this section:\n\n {objectives}
 
     When researching, consider the following key points:
     - you need to gather enough information to write a 2,000-word section
@@ -25,7 +24,6 @@ write_section:
     Here is the title of the section: {section_title}
     Here is the outline description for the section:\n\n {section_description}
     Here is the skill or key points that will be covered in this section:\n\n {covered_skills}
-    Here is the objective that students should achieve after reading this section:\n\n {objectives}
 
     Important notes:
     - The section you are writing needs to fit in well with the rest of the sections in the book.
