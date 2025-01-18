@@ -17,9 +17,7 @@ class BookOutlineCrew():
 
   @agent
   def researcher(self) -> Agent:
-    return Agent(config=self.agents_config['researcher'], llm=self.llm, tools=[
-    SerperDevTool(), 
-    ], verbose=True)
+    return Agent(config=self.agents_config['researcher'], llm=self.llm, tools=[SerperDevTool()])
 
   @agent
   def planner(self) -> Agent:

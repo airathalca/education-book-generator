@@ -34,23 +34,6 @@ class BookFlow(Flow[BookState]):
     outline = crew.crew().kickoff(inputs={"topic": self.state.topic})
     self.state.title = outline["title"]
     self.state.book_outline = outline["sections"]
-  
-  @listen(generate_book_outline)
-  def save_book_outline(self):
-    print("Saving book outline")
-    content = ""
-    for section in self.state.book_outline:
-      content += f"# {section.title}\n"
-      content += f"{section.description}\n\n"
-      content += f"## Covered Skills\n"
-      for skill in section.covered_skills:
-        content += f"- {skill}\n"
-      content += "\n"
-      content += f"## Learning Objectives\n"
-      for objective in section.objectives:
-        content += f"- {objective}\n"
-      content += "\n"
-    self.write_to_file(f"{self.state.title.replace(' ', '_')}_outline.md", content, "w")
 
   @listen(generate_book_outline)
   async def generate_book(self):
@@ -69,8 +52,6 @@ class BookFlow(Flow[BookState]):
       })
       title = content["title"]
       content = content["content"]
-      section_content = f"# {title}\n{content}\n\n"
-      self.write_to_file(f"{self.state.title.replace(' ', '_')}.md", section_content)
       
       section = Section(title=title, content=content)
       return section
