@@ -38,6 +38,5 @@ class BookContentCrew():
       agents=self.agents,
       tasks=self.tasks,
       process=Process.sequential,
-      verbose=True,
       max_rpm=10,
     )

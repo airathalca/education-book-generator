@@ -12,6 +12,8 @@ class BookState(BaseModel):
   book: List[Section] = []
   book_outline: List[SectionOutline] = []
   topic: str = "Sorting Algorithms"
+  book_outline_md: str = ""
+  book_md: str = ""
 
 class BookFlow(Flow[BookState]):
   initial_state = BookState
@@ -33,6 +35,17 @@ class BookFlow(Flow[BookState]):
     crew = BookOutlineCrew()
     outline = crew.crew().kickoff(inputs={"topic": self.state.topic})
     self.state.title = outline["title"]
+    for section in outline["sections"]:
+      self.state.book_outline_md += f"# {section.title}\n"
+      self.state.book_outline_md += f"{section.description}\n\n"
+      self.state.book_outline_md += f"## Covered Skills\n"
+      for skill in section.covered_skills:
+        self.state.book_outline_md += f"- {skill}\n"
+      self.state.book_outline_md += "\n"
+      self.state.book_outline_md += f"## Learning Objectives\n"
+      for objective in section.objectives:
+        self.state.book_outline_md += f"- {objective}\n"
+      self.state.book_outline_md += "\n"
     self.state.book_outline = outline["sections"]
 
   @listen(generate_book_outline)
@@ -52,8 +65,9 @@ class BookFlow(Flow[BookState]):
       })
       title = content["title"]
       content = content["content"]
-      
       section = Section(title=title, content=content)
+      section_content = f"# {title}\n\n{content}\n\n"
+      self.state.book_md += section_content
       return section
     for section in self.state.book_outline:
       print(f"Generating content for {section.title}")
@@ -65,7 +79,7 @@ class BookFlow(Flow[BookState]):
     print(f"Book generated with {len(self.state.book)} sections")
 
 def kickoff():
-  book_name = BookFlow(title="Mastering Search Algorithms", topic="Search Algorithms")
+  book_name = BookFlow()
   book_name.kickoff()
 
 def plot():
