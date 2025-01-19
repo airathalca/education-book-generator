@@ -14,6 +14,7 @@ class BookState(BaseModel):
   topic: str = "Sorting Algorithms"
   book_outline_md: str = ""
   book_md: str = ""
+  section_finished: int = 0
 
 class BookFlow(Flow[BookState]):
   initial_state = BookState
@@ -25,7 +26,6 @@ class BookFlow(Flow[BookState]):
 
   @start()
   def initialize(self, topic: str = None):
-    print("Initializing book flow")
     if topic:
       self.state.topic = topic
 
@@ -68,6 +68,7 @@ class BookFlow(Flow[BookState]):
       section = Section(title=title, content=content)
       section_content = f"# {title}\n\n{content}\n\n"
       self.state.book_md += section_content
+      self.state.section_finished += 1
       return section
     for section in self.state.book_outline:
       print(f"Generating content for {section.title}")

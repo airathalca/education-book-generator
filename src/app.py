@@ -8,6 +8,8 @@ def reset_state():
   st.session_state.book = None
   st.session_state.title = None
   st.session_state.book_flow = None
+  st.session_state.section_finished = 0
+  st.session_state.total_sections = 0
 
 def start_generation(topic):
   book_flow = BookFlow()
@@ -23,7 +25,9 @@ def update_state():
     if hasattr(book_flow.state, "book_outline") and book_flow.state.book_outline and st.session_state.book_outline is None:
       st.session_state.book_outline = book_flow.state.book_outline_md
       st.session_state.title = book_flow.state.title
-    print(book_flow.state.book, st.session_state.book)
+      st.session_state.total_sections = len(book_flow.state.book_outline)
+    if hasattr(book_flow.state, "section_finished") and book_flow.state.section_finished != st.session_state.section_finished:
+      st.session_state.section_finished = book_flow.state.section_finished
     if hasattr(book_flow.state, "book") and book_flow.state.book and st.session_state.book is None:
       st.session_state.book = book_flow.state.book_md
       st.session_state.generation_started = False
@@ -41,6 +45,8 @@ if "title" not in st.session_state:
   st.session_state.title = None
 if "book_flow" not in st.session_state:
   st.session_state.book_flow = None
+if "section_finished" not in st.session_state:
+  st.session_state.section_finished = 0
 
 # Button to start generation
 if st.button("Generate Book"):
@@ -61,7 +67,7 @@ if st.session_state.generation_started:
       file_name=outline_filename,
       mime="text/markdown"
     )
-    st.write("Generating book content... Please wait.")
+    st.progress(st.session_state.section_finished / st.session_state.total_sections, text=f"Generating book content... {st.session_state.section_finished}/{st.session_state.total_sections}")
 elif st.session_state.book_outline is not None and st.session_state.book is not None:
   st.write("Book Outline is ready")
   outline_filename = f"{st.session_state.title.replace(' ', '_')}_outline.md"
@@ -79,6 +85,7 @@ elif st.session_state.book_outline is not None and st.session_state.book is not 
     file_name=content_filename,
     mime="text/markdown"
   )
-time.sleep(5)
-update_state()
-st.rerun()
+if st.session_state.generation_started:
+  time.sleep(5)
+  update_state()
+  st.rerun()
