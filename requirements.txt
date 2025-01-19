@@ -4,3 +4,4 @@ pydantic
 langchain-groq
 langchain-community
 streamlit
+pysqlite3-binary
