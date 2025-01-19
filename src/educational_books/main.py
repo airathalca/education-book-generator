@@ -1,8 +1,4 @@
 #!/usr/bin/env python
-__import__('pysqlite3')
-import sys
-sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
-
 from pydantic import BaseModel
 from typing import List
 from crewai.flow.flow import Flow, listen, start
