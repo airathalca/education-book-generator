@@ -2,6 +2,7 @@ from crewai import Agent, Crew, Process, Task, LLM
 from crewai.project import CrewBase, agent, crew, task
 from crewai_tools import SerperDevTool, WebsiteSearchTool
 from dotenv import load_dotenv
+import streamlit as st
 import os
 
 from educational_books.types import BookOutline
@@ -13,7 +14,8 @@ class BookOutlineCrew():
   """Bookoutline crew"""
   agents_config = 'config/agents.yaml'
   tasks_config = 'config/tasks.yaml'
-  llm = LLM(model="gemini/gemini-2.0-flash-exp")
+  api_key = os.getenv("OPENAI_API_KEY") if os.getenv("OPENAI_API_KEY") else st.secrets["OPENAI_API_KEY"]
+  llm = LLM(model="gemini/gemini-2.0-flash-exp", api_key=api_key)
 
   @agent
   def researcher(self) -> Agent:
