@@ -12,45 +12,36 @@ First, if you haven't already, install uv:
 pip install uv
 ```
 
-Next, navigate to your project directory and install the dependencies:
+Next, navigate to your project directory and install the requirements:
 
-(Optional) Lock the dependencies and install them by using the CLI command:
+```bash
+uv pip install -r requirements.txt
+```
+
+Lock the dependencies and install them by using the CLI command:
 ```bash
 crewai install
 ```
 
-### Customizing
+## Customizing
 
-**Add your `OPENAI_API_KEY` into the `.env` file**
+**Add your `SERPER_API_KEY` into the `.env` file**
 
-- Modify `src/educational_books/config/agents.yaml` to define your agents
-- Modify `src/educational_books/config/tasks.yaml` to define your tasks
-- Modify `src/educational_books/crew.py` to add your own logic, tools and specific args
-- Modify `src/educational_books/main.py` to add custom inputs for your agents and tasks
+**Add your `GEMINI_API_KEY` into the `.env` file**
+
+**You can use other LLMs by changing the model in the `src/educational_books/crews/book_content/book_content.py` file and the `src/educational_books/crews/book_outline/book_outline.py` file**
 
 ## Running the Project
 
-To kickstart your crew of AI agents and begin task execution, run this from the root folder of your project:
+To run the project, use the following command:
 
 ```bash
-crewai run
+streamlit run src/app.py
 ```
 
-This command initializes the educational_books Crew, assembling the agents and assigning them tasks as defined in your configuration.
-
-This example, unmodified, will run the create a `report.md` file with the output of a research on LLMs in the root folder.
+## Deployment
+You can access the streamlit app by clicking [here](https://huggingface.co/spaces/fr1tzTh/education_book_generator)
 
 ## Understanding Your Crew
 
 The educational_books Crew is composed of multiple AI agents, each with unique roles, goals, and tools. These agents collaborate on a series of tasks, defined in `config/tasks.yaml`, leveraging their collective skills to achieve complex objectives. The `config/agents.yaml` file outlines the capabilities and configurations of each agent in your crew.
-
-## Support
-
-For support, questions, or feedback regarding the {{crew_name}} Crew or crewAI.
-
-- Visit our [documentation](https://docs.crewai.com)
-- Reach out to us through our [GitHub repository](https://github.com/joaomdmoura/crewai)
-- [Join our Discord](https://discord.com/invite/X4JWnZnxPb)
-- [Chat with our docs](https://chatg.pt/DWjSBZn)
-
-Let's create wonders together with the power and simplicity of crewAI.
